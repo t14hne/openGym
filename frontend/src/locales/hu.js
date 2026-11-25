@@ -5900,4 +5900,8 @@ export default {
   "Preview on": "Előnézet itt",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "kicsit rövidebben",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Kardió: egyező beállítások",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Két befejezett, egybefüggő edzéshez azonos edzőterem, időtartam, sebesség és gépbeállítás, valamint pulzusadat szükséges.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Az egyező beállítások különböző gépeken is lehetnek. A pulzus sok okból változik.",
 }

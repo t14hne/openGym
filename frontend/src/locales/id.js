@@ -5862,4 +5862,8 @@ export default {
   "Preview on": "Pratinjau di",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "sedikit lebih singkat",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Kardio: pengaturan yang sama",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Dua sesi berkelanjutan yang selesai memerlukan gym, durasi, kecepatan, dan pengaturan mesin yang sama, serta data detak jantung.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Pengaturan yang sama dapat berasal dari mesin berbeda. Detak jantung berubah karena banyak hal.",
 };

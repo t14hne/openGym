@@ -5897,4 +5897,8 @@ export default {
   "Preview on": "प्रीव्यू यहां",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "थोड़ा छोटा",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "कार्डियो: समान सेटिंग्स",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "दो पूरी की गई लगातार कसरतों में एक ही जिम, अवधि, गति और मशीन सेटिंग्स के साथ हृदय गति दर्ज होनी चाहिए।",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "एक जैसी सेटिंग्स अलग मशीनों पर हो सकती हैं। हृदय गति कई कारणों से बदलती है।",
 }

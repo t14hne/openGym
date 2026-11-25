@@ -4326,6 +4326,10 @@ export const PT_BR_OVERRIDES = {
   "iOS ends it after 8 hours, and a swipe removes it. It comes back with your next set.": "O iOS encerra depois de 8 horas, e um deslize remove. Volta com sua próxima série.",
   "Android Settings, Apps, openGym, Notifications.": "Configurações do Android, Apps, openGym, Notificações.",
   "Follows the main page. Switch this on to pick the details and buttons for this type yourself.": "Segue a página principal. Ative isto para escolher você mesmo os detalhes e os botões deste tipo.",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Cardio: ajustes iguais",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Duas sessões contínuas concluídas precisam ter a mesma academia, duração, velocidade e ajustes do aparelho, além da frequência cardíaca.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Ajustes iguais podem ser de aparelhos diferentes. A frequência cardíaca varia por muitos motivos.",
 }
 
 export default { ...pt, ...PT_BR_OVERRIDES }

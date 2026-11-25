@@ -5908,4 +5908,8 @@ export default {
   "Preview on": "ดูตัวอย่างบน",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "สั้นลงหน่อย",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "คาร์ดิโอ: การตั้งค่าที่ตรงกัน",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "ต้องมีการออกกำลังต่อเนื่องที่เสร็จแล้วสองครั้ง โดยใช้ยิม ระยะเวลา ความเร็ว และการตั้งค่าเครื่องเดียวกัน พร้อมข้อมูลอัตราการเต้นหัวใจ",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "การตั้งค่าที่ตรงกันอาจมาจากคนละเครื่อง อัตราการเต้นหัวใจเปลี่ยนได้จากหลายสาเหตุ",
 }

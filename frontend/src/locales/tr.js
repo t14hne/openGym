@@ -5897,4 +5897,8 @@ export default {
   "Preview on": "Önizleme yeri",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "biraz daha kısa",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Kardiyo: eşleşen ayarlar",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Tamamlanmış iki kesintisiz seans için aynı spor salonu, süre, hız ve cihaz ayarları ile nabız kaydı gerekir.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Aynı ayarlar farklı cihazlarda olabilir. Nabız birçok nedenle değişir.",
 }

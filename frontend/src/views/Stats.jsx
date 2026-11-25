@@ -14,6 +14,7 @@ import { nameIn } from '../lib/a11y-name.js'
 import { lifetimeTotals, likenessOf } from '../lib/lifetime.js'
 import { LB_KG } from '../lib/units.js'
 import CardioWeekCard from '../components/CardioWeek.jsx'
+import CardioCompare from '../components/CardioCompare.jsx'
 import { bwSheet, goalSheet, calendarSheet, dayOverrideSheet, workoutDetailSheet, exerciseHistorySheet, WorkoutRow, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
 import WeightRate from '../components/WeightRate.jsx'
@@ -945,6 +946,7 @@ export default function Stats() {
     {on('health') && <DailyFormCard S={S} />}
     {/* Cardio minutes a week, with a goal if you set one (D#84). */}
     {workouts.length > 0 && <CardioWeekCard S={S} />}
+    {workouts.length > 0 && <CardioCompare S={S} />}
 
     <div className="card">
       <SeasonDeco spot="stats-heatmap" />

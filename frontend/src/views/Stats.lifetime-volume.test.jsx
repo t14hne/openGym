@@ -65,6 +65,11 @@ describe('Stats: lifted in total', () => {
 })
 
 describe('Stats: all-time sums and cardio (1.4.5)', () => {
+  it('offers the comparison when cardio has been logged', () => {
+    const today = todayISO()
+    mount({}, [...history(), { id: 'c', d: today, start: Date.now() - 3600e3, end: Date.now(), entries: [{ id: '2141', target: { mode: 'cardio' }, sets: [{ min: 45, speed: 10, done: true }] }] }])
+    expect(host.querySelector('[data-cardio-compare]')?.textContent).toContain('No data yet')
+  })
   it('lists workouts, sets and hours under the total, with a size to picture', () => {
     mount({}, history())
     expect(host.querySelector('[data-lifetime-totals]').textContent).toBe('3 workouts · 13 sets · 3 h')

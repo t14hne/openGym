@@ -5863,4 +5863,8 @@ export default {
   "Preview on": "Náhled na",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "kratší",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Kardio: shodná nastavení",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Dvě dokončené souvislé aktivity potřebují stejnou posilovnu, délku, rychlost a nastavení stroje a záznam tepu.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Shodná nastavení mohou být na různých strojích. Tep ovlivňuje mnoho faktorů.",
 }

@@ -5894,4 +5894,8 @@ export default {
   "Preview on": "Попередній перегляд на",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "трохи коротше",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Кардіо: однакові налаштування",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Для двох завершених безперервних занять потрібні однакові зал, тривалість, швидкість і налаштування тренажера, а також дані пульсу.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Однакові налаштування можуть бути на різних тренажерах. Пульс змінюється з багатьох причин.",
 }

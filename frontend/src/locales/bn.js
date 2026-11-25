@@ -5976,4 +5976,8 @@ export default {
   "Preview on": "প্রিভিউ দেখুন",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "একটু কম সময়",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "কার্ডিও: মিল থাকা সেটিংস",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "একটি করে অংশের দুটি সম্পূর্ণ সেশনে একই জিম, সময়, গতি ও মেশিনের সেটিংস এবং হৃদস্পন্দনের তথ্য প্রয়োজন।",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "একই সেটিংস ভিন্ন মেশিনে হতে পারে। অনেক কারণে হৃদস্পন্দন বদলায়।",
 }

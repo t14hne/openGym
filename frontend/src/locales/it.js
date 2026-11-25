@@ -5907,4 +5907,8 @@ export default {
   "Preview on": "Anteprima su",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "un po’ più corto",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Cardio: impostazioni corrispondenti",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Servono due sessioni continue completate con stessa palestra, durata, velocità e impostazioni della macchina, oltre alla frequenza cardiaca.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Impostazioni uguali possono riferirsi a macchine diverse. La frequenza cardiaca varia per molti motivi.",
 }

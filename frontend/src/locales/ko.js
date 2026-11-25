@@ -5897,4 +5897,8 @@ export default {
   "Preview on": "미리 볼 화면",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "조금 짧게",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "유산소: 같은 설정",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "완료한 연속 운동 두 회에 같은 체육관, 시간, 속도와 기구 설정 및 심박수 기록이 필요합니다.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "설정이 같아도 기구는 다를 수 있습니다. 심박수는 여러 이유로 달라집니다.",
 }

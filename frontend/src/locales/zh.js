@@ -5897,4 +5897,8 @@ export default {
   "Preview on": "预览位置",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "缩短一点",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "有氧：相同设置",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "需要两次已完成的连续运动，且健身房、时长、速度和器械设置相同，并记录心率。",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "设置相同也可能使用不同器械。心率会因许多因素而变化。",
 }

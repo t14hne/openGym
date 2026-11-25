@@ -5863,4 +5863,8 @@ export default {
   "Preview on": "Xem trước trên",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "ngắn hơn",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "Cardio: thiết lập trùng khớp",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "Hai buổi tập liên tục đã hoàn thành cần cùng phòng tập, thời lượng, tốc độ và thiết lập máy, cùng với dữ liệu nhịp tim.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "Thiết lập giống nhau có thể ở các máy khác nhau. Nhịp tim thay đổi vì nhiều lý do.",
 };

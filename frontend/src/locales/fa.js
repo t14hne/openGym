@@ -5863,4 +5863,8 @@ export default {
   "Preview on": "پیش‌نمایش روی",
   // 1.4.5 UX round, P2: timed holds in the finish summary (next hold is shorter)
   "shorter": "کمی کوتاه‌تر",
+  // Cardio comparison; translations require native-language review.
+  "Cardio: matching settings": "کاردیو: تنظیمات یکسان",
+  "Two completed continuous sessions need the same gym, duration, speed and machine settings, plus heart rate.": "دو جلسه پیوسته و کامل باید باشگاه، مدت، سرعت و تنظیمات دستگاه یکسان و اطلاعات ضربان قلب داشته باشند.",
+  "Matching settings may use different machines. Heart rate varies for many reasons.": "تنظیمات یکسان ممکن است مربوط به دستگاه‌های متفاوت باشند. ضربان قلب به دلایل زیادی تغییر می‌کند.",
 }
