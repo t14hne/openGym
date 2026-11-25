@@ -20,6 +20,10 @@ Manual walks can be recorded as activities and included in weekly walking and ov
 
 Repetitions in reserve are subjective estimates; one [study of their accuracy](https://pubmed.ncbi.nlm.nih.gov/29204323/) found imperfect prediction. A [small five-week randomised trial](https://pubmed.ncbi.nlm.nih.gov/37144554/) in trained adults did not find significant strength or hypertrophy differences between the studied near-failure and further-from-failure groups. These studies do not validate a universal readiness threshold or require every set to reach failure.
 
+Cardio RPE describes perceived exertion and is not a count of repetitions left in reserve. The strength-effort summary and exercise chart exclude cardio sets from RIR calculations; an exercise-history row can still show its logged cardio RPE as RPE. Historical RPE fields can originate from imports and do not always identify the rating scale, so they cannot safely be converted retrospectively into CDC intensity categories. The pre-existing recovery model remains a heuristic and has not been clinically validated.
+
+The app's initial cardio duration and speed are editable interface defaults, not individually established starting prescriptions. A [randomised trial of novice runners](https://pubmed.ncbi.nlm.nih.gov/17940147/) did not find that a 10% progression rule reduced injury compared with the trial's other programme; this does not establish that larger increases are safe either.
+
 ## Symptoms
 
 [NHS exercise guidance](https://www.cuh.nhs.uk/patient-information/cardiac-rehabilitation-home-exercise-guidelines/) identifies symptoms that require stopping exercise in its cardiac rehabilitation context. [NHS heart attack guidance](https://www.nhs.uk/conditions/heart-attack/) distinguishes urgent symptoms and emergency action. Any future symptom messaging needs an appropriate scope and clinical review rather than treating every symptom as having the same urgency.

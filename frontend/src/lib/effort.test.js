@@ -78,6 +78,13 @@ describe('avgRir', () => {
 })
 
 describe('effortSummary', () => {
+  it('does not treat cardio effort as strength repetitions in reserve', () => {
+    const strength = W(2, [{ rir: 3 }, { rir: 3 }, { rir: 3 }, { rir: 3 }, { rir: 3 }])
+    const cardio = { ...W(1, []), entries: [{ id: '0685', target: { mode: 'cardio' }, sets: [{ min: 25, speed: 5, rpe: 9, done: true }] }] }
+    const st = S(strength, cardio)
+    expect(effortSummary(st, 0)).toMatchObject({ done: 5, rated: 5, avg: 3, hard: 5 })
+    expect(effortHistogram(st, 0).map(x => x.n)).toEqual([0, 0, 0, 5, 0])
+  })
   const st = S(
     W(2, [{ rir: 1 }, { rir: 3 }, { rir: 2 }]),
     W(4, [{ rir: 0 }, { rpe: 6 }, {}]),          // RPE 6 = RIR 4, one set unrated
@@ -132,6 +139,11 @@ describe('effortSummary', () => {
 })
 
 describe('hasEffort', () => {
+  it('does not show strength-effort statistics for legacy custom cardio logs', () => {
+    const st = S({ ...W(1, []), entries: [{ id: 'my-cardio', sets: [{ min: 20, speed: 4, rpe: 8, done: true }] }] })
+    expect(hasEffort(st)).toBe(false)
+    expect(effortSummary(st, 0).done).toBe(0)
+  })
   it('decides whether the effort UI exists at all', () => {
     expect(hasEffort(S(W(2, [{ rir: 0 }])))).toBe(true)
     expect(hasEffort(S(W(2, [{ rpe: 8 }])))).toBe(true)

@@ -393,6 +393,18 @@ describe('Stats estimated effort', () => {
   const effortHead = () => [...container.querySelectorAll('.card h2')]
     .find(h => h.textContent.trim().startsWith('Effort'))
 
+  it('does not present cardio ratings as reps left in the tank', async () => {
+    const sessions = [1, 2, 3].map(n => workout('cardio-' + n, BASE_NOW - n * DAY, [
+      { id: '0685', target: { mode: 'cardio' }, sets: [{ min: 20, speed: 5, rpe: 8, done: true }] },
+    ]))
+    resetFixture(sessions)
+    await mountStats()
+    expect(effortHead()).toBeUndefined()
+    expect(container.textContent).not.toContain('A fuller dot means less left in the tank')
+    expect(container.querySelector('[data-ex-days]').textContent).not.toContain('RIR 2')
+    expect(container.querySelector('[data-ex-days]').textContent).toContain('RPE 8')
+  })
+
   it('badges estimated numbers on unrated import history', async () => {
     resetFixture([workout('unrated', BASE_NOW, [
       entry('0025', Array.from({ length: 6 }, () => set(true, { w: 80, r: 8 }))),

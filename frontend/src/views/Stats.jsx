@@ -759,7 +759,7 @@ export default function Stats() {
   // Effort on this exercise, per session. It rides on the top-set curve as well as having a
   // curve of its own, because the two only mean something together: the same weight moved
   // with more left in the tank is progress a weight-only chart draws as a flat line.
-  const exRir = exPts.map(p => avgRir(p.sets))
+  const exRir = exPts.map(p => curCardio ? null : avgRir(p.sets))
   const showEff = effortOn && exRir.filter(v => v != null).length >= 3
   const effPts = exPts.map((p, i) => (exRir[i] == null ? null : { t: p.t, y: toScale(kind, exRir[i]), d: p.d })).filter(p => p && inExRange(p))
   // Pyramid sets' Max sets: the most reps in one, per workout — the point of a Max set is seeing
@@ -1050,11 +1050,12 @@ export default function Stats() {
         </div>}
         <div className="ex-days" data-ex-days>{exList.map((p, i) => {
           const top = topSetOf(p.sets)
-          const rir = top && effortOn ? rirOf(top) : null
+          const rir = top && effortOn && !curCardio ? rirOf(top) : null
+          const cardioRpe = top && effortOn && curCardio && Number.isFinite(Number(top.rpe)) && top.rpe != null ? Number(top.rpe) : null
           return <div key={i} className="ex-day" {...tappable(() => exerciseHistorySheet(curEx))}>
             <span className="ex-day-d">{fmtDate(p.d, true)}</span>
             <span className="ex-day-s">{top ? setLabel(curEx, strip(top), p.target, speedUnit) : ''}</span>
-            <span className="ex-day-e">{rir != null && <span className="ex-eff" style={{ '--m': 1 - Math.min(4, Math.max(0, rir)) / 4 }}>{hd} {fmtNum(toScale(kind, rir))}</span>}</span>
+            <span className="ex-day-e">{rir != null && <span className="ex-eff" style={{ '--m': 1 - Math.min(4, Math.max(0, rir)) / 4 }}>{hd} {fmtNum(toScale(kind, rir))}</span>}{cardioRpe != null && <span className="ex-eff">{t('RPE {0}', fmtNum(cardioRpe))}</span>}</span>
           </div>
         })}</div>
       </> : <div className="muted small">{t('Finish your first workout and your progress curves will show up here.')}</div>}

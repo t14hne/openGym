@@ -6,7 +6,7 @@
 // half-empty series. So everything aggregates in RIR and is converted back for display.
 // RIR is the internal unit because it has a real zero — a set taken to failure — where RPE's
 // floor of 6 is only a convention about which sets are worth rating. RPE 8 == RIR 2.
-import { EFFORT, effortOf, workoutAt } from './history.js'
+import { EFFORT, effortOf, workoutAt, modeOf } from './history.js'
 import { weekKey, weekStartOf, startOfWeek } from './format.js'
 import { isWarmupRow, isFailureSet } from './workout-model.js'
 import { isAssisted } from './exercises.js'
@@ -49,8 +49,12 @@ export const scaleName = kind => EFFORT[kind].hd
 // belongs to, which is what the windowed and per-week views need.
 function eachDoneSet(S, fn) {
   ;(S.workouts || []).forEach(w =>
-    (w.entries || []).forEach(e =>
-      (e.sets || []).forEach(s => { if (s.done && !isWarmupRow(s)) fn(s, w, e) })))
+    (w.entries || []).forEach(e => {
+      // Cardio RPE records perceived exertion, not the reps remaining in a strength set.
+      if (modeOf({ ...(e.target || {}), id: e.id }) === 'cardio'
+        || (!e.target?.mode && (e.sets || []).some(s => Number(s?.min) > 0 || Number(s?.speed) > 0))) return
+      ;(e.sets || []).forEach(s => { if (s.done && !isWarmupRow(s)) fn(s, w, e) })
+    }))
 }
 
 // A window in days, counted back from now. 0 = everything, which is also what an empty
