@@ -25,14 +25,14 @@
 import { NOTE_MAX } from './history.js'
 import { hashId } from './weigh-ins.js'
 
-export const SPORTS = ['run', 'ride', 'swim', 'hike', 'row', 'ski', 'football', 'racket', 'ball', 'climb', 'fight', 'yoga', 'dance', 'other']
+export const SPORTS = ['run', 'walk', 'ride', 'swim', 'hike', 'row', 'ski', 'football', 'racket', 'ball', 'climb', 'fight', 'yoga', 'dance', 'other']
 export const SPORT_LABEL = {
-  run: 'Run', ride: 'Ride', swim: 'Swim', hike: 'Hike', row: 'Rowing', ski: 'Skiing', football: 'Football',
+  run: 'Run', walk: 'Walk', ride: 'Ride', swim: 'Swim', hike: 'Hike', row: 'Rowing', ski: 'Skiing', football: 'Football',
   racket: 'Racket sports', ball: 'Ball games', climb: 'Climbing', fight: 'Boxing & martial arts', yoga: 'Yoga & pilates',
   dance: 'Dance', other: 'Other sport',
 }
 export const SPORT_ICON = {
-  run: 'figureRun', ride: 'bike', swim: 'swim', hike: 'tree', row: 'arm', ski: 'snowflake', football: 'target',
+  run: 'figureRun', walk: 'person', ride: 'bike', swim: 'swim', hike: 'tree', row: 'arm', ski: 'snowflake', football: 'target',
   racket: 'bolt', ball: 'trophy', climb: 'pullup', fight: 'boxing', yoga: 'stretch', dance: 'sparkles', other: 'flag',
 }
 // The durations the sheet offers in one tap, in minutes.
@@ -154,6 +154,8 @@ export function activityStimuli(S, now = Date.now(), windowMs = 30 * 86400e3) {
   if (S?.activityRecovery === false) return []
   const out = []
   for (const a of activitiesOf(S)) {
+    // Duration alone does not establish the intensity or resistance-training equivalent of a walk.
+    if (a.sport === 'walk') continue
     const ts = a.at > 0 ? a.at + a.min * 60e3 : localNoon(a.d)
     if (!(ts <= now) || now - ts > windowMs) continue
     const load = SPORT_LOAD[a.sport] || SPORT_LOAD.other

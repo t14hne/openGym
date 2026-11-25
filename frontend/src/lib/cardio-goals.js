@@ -54,7 +54,7 @@ export function kindOfEntry(e, S) {
 
 // Sport from lib/activities.js. Any sport that keeps you moving is cardio; yoga, climbing and
 // "other" are not counted at all.
-const SPORT_KIND = { run: 'run', ride: 'ride', swim: 'swim', hike: 'hike', row: 'row', ski: 'ski', football: 'any', racket: 'any', ball: 'any', dance: 'any', fight: 'any' }
+const SPORT_KIND = { run: 'run', walk: 'walk', ride: 'ride', swim: 'swim', hike: 'hike', row: 'row', ski: 'ski', football: 'any', racket: 'any', ball: 'any', dance: 'any', fight: 'any' }
 export const kindOfSport = sport => SPORT_KIND[sport] || null
 
 /** One entry's cardio: { min, km }, both 0 for an entry that is no cardio. */

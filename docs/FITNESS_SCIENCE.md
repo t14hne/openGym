@@ -14,6 +14,8 @@ The [CDC talk test](https://www.cdc.gov/physicalactivity/basics/measuring/index.
 
 Product implications are conservative design choices, not clinically validated predictions: compare only sufficiently similar activities and recorded conditions; never treat missing effort, recovery or wearable data as proof of readiness; make recommendations reviewable and avoid silently changing a plan. Outdoor walks can contribute to aerobic activity but do not automatically substitute for resistance training.
 
+Manual walks can be recorded as activities and included in weekly walking and overall activity minutes. These are logged durations, not verified minutes of moderate or vigorous intensity; the app cannot establish the WHO target from duration alone. The existing recovery model receives no invented resistance-set equivalent for a walk with unknown intensity. This is missing information, not proof that the walk caused no fatigue or that the user is recovered. Automatic health-store walk import remains off.
+
 ## Strength effort
 
 Repetitions in reserve are subjective estimates; one [study of their accuracy](https://pubmed.ncbi.nlm.nih.gov/29204323/) found imperfect prediction. A [small five-week randomised trial](https://pubmed.ncbi.nlm.nih.gov/37144554/) in trained adults did not find significant strength or hypertrophy differences between the studied near-failure and further-from-failure groups. These studies do not validate a universal readiness threshold or require every set to reach failure.

@@ -64,6 +64,12 @@ const S0 = () => ({
 })
 
 describe('the sums per week', () => {
+  it('counts a manually logged walk in walk and overall activity totals', () => {
+    const S = { weekStart: 1, activities: { walk: { d: '2026-11-04', sport: 'walk', min: 30, src: 'manual' } } }
+    const w = cardioWeekTotals(S, { today: '2026-11-06' }).at(-1)
+    expect(w.by.walk).toEqual({ min: 30, km: 0, n: 1 })
+    expect(w.by.any).toEqual({ min: 30, km: 0, n: 1 })
+  })
   it('adds minutes, distance and sessions per activity', () => {
     const weeks = cardioWeekTotals(S0(), { today: '2026-11-06' })
     expect(weeks).toHaveLength(8)

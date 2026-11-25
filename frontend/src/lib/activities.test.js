@@ -10,6 +10,11 @@ import { parseImport, mergeImport } from './import-csv.js'
 const at = (iso, h = 18) => new Date(`${iso}T${String(h).padStart(2, '0')}:00:00`).getTime()
 
 describe('activities: the stored entry', () => {
+  it('saves a manually logged walk as a walk', () => {
+    const map = withActivity({}, 'walk-1', { d: '2026-11-02', sport: 'walk', min: 30, src: 'manual' }, 10)
+    expect(activitiesOf({ activities: map })).toMatchObject([{ id: 'walk-1', sport: 'walk', min: 30 }])
+    expect(activityLine(activitiesOf({ activities: map })[0])).toContain('Walk')
+  })
   it('reads a clean entry and drops broken ones', () => {
     expect(readActivity({ d: '2026-11-02', sport: 'run', min: 42.4, km: 8.123, src: 'hc' })).toEqual({ d: '2026-11-02', sport: 'run', min: 42, km: 8.12, src: 'hc' })
     expect(readActivity({ d: '2026-11-02', sport: 'quidditch', min: 30 }).sport).toBe('other')
@@ -48,6 +53,10 @@ describe('activities: the week streak', () => {
 })
 
 describe('activities: the recovery model', () => {
+  it('does not invent a resistance-training equivalent for a walk of unknown intensity', () => {
+    const S = { activities: { w: { d: '2026-11-02', sport: 'walk', min: 30 } } }
+    expect(activityStimuli(S, at('2026-11-02', 21))).toEqual([])
+  })
   it('football tires the legs and leaves the arms alone', () => {
     const now = at('2026-11-02', 21)
     const S = { activities: { a: { d: '2026-11-02', sport: 'football', min: 90, at: at('2026-11-02', 18) } } }

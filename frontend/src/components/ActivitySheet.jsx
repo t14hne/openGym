@@ -51,7 +51,7 @@ function ActivityLog({ id = null, day = null, close }) {
     <h3>{had ? t('Edit activity') : t('Log an activity')}</h3>
     <div className="muted small" style={{ marginBottom: 12 }}>
       {had && SOURCE_LINE[had.src] ? t(SOURCE_LINE[had.src]) + '. ' : ''}
-      {t('Sport outside the gym. It shows in your history and calendar and tires the muscles it used, but adds no sets.')}
+      {sport !== 'walk' && t('Sport outside the gym. It shows in your history and calendar and tires the muscles it used, but adds no sets.')}
     </div>
     <div className="chips rec-kinds" role="radiogroup" aria-label={t('Sport')} style={{ margin: '0 0 12px', flexWrap: 'wrap' }}>
       {SPORTS.map(k => <button key={k} type="button" role="radio" aria-checked={sport === k}
