@@ -36,6 +36,7 @@ function previewLine(st, cfg, work, unit) {
 
 export default function WarmupConfig({ st, ex, c, setC }) {
   const cfg = { ...c, id: ex.id }
+  const assisted = isAssisted(cfg)
   const mode = modeOf(cfg)
   const choice = warmupChoiceOf(c)
   const floor = barFloor(st, ex.id)
@@ -58,12 +59,12 @@ export default function WarmupConfig({ st, ex, c, setC }) {
   const options = [
     { value: 'default', label: defaultLabel, subtitle: t('Follows Settings → Workout → Automatic warm-ups.') },
     { value: 'auto', label: t('Auto'), subtitle: t('Ramped from the work weight: more rungs when it is heavy, fewer when it is light.') },
-    { value: 'own', label: t('My own'), subtitle: t('Your rows, as a share of the work weight, so they grow with it.') },
+    ...(!assisted || choice === 'own' ? [{ value: 'own', label: t('My own'), subtitle: assisted ? t('Not available right now.') : t('Your rows, as a share of the work weight, so they grow with it.') }] : []),
     { value: 'count', label: t('A number of ramp sets'), subtitle: t('Each one closes half the gap to the work weight.') },
     { value: 'none', label: t('None'), subtitle: t('Straight into the work sets.') },
   ]
   const shown = choice === 'auto' || (choice === 'default' && followsAuto) || choice === 'own'
-  const preview = shown && mode === 'reps' ? previewLine(st, cfg, work, unit) : null
+  const preview = shown && mode === 'reps' && !(assisted && choice === 'own') ? previewLine(st, cfg, work, unit) : null
   // The lightest a rung can be: the bar on a barbell lift, the body alone on a bodyweight one.
   const lowest = floor > 0 || bw ? 0 : 5
   const pctLabel = r => (r.wb ? t('Bar') : r.wp === 0 ? t('Body') : r.wp + '%')
@@ -75,7 +76,7 @@ export default function WarmupConfig({ st, ex, c, setC }) {
       <Stepper label={t('Warm-up sets')} value={c.warmupSets || 1} step={1} min={1} max={MAX_PLANNED_WARMUPS} decimal={false}
         onChange={v => setC(x => ({ ...x, warmupSets: Math.max(1, Math.min(MAX_PLANNED_WARMUPS, Math.round(v) || 1)) }))} />
     </div>}
-    {choice === 'own' && <div className="warmup-rows">
+    {choice === 'own' && !assisted && <div className="warmup-rows">
       {rows.map((r, i) => <div className="row cfgrow warmup-row" key={i} style={{ marginBottom: 6, alignItems: 'flex-end' }}>
         <Stepper label={t('Warm-up {0}', i + 1)} value={r.wb ? 0 : r.wp} step={5} min={lowest} max={OWN_PCT_MAX} decimal={false}
           ariaLabel={t('Warm-up {0}', i + 1) + ': ' + pctLabel(r)}
@@ -93,7 +94,10 @@ export default function WarmupConfig({ st, ex, c, setC }) {
     </div>}
     <div className="small dim" style={{ marginTop: 6 }}>
       {/* Settings > Units can count warm-ups in volume (#719); records and progression never do. */}
-      {preview ? t('With {0} {1} today: {2}', fmtNum(work), unit, preview)
+      {assisted && choice === 'own' ? <>{t('Not available right now.')} {t('A number of ramp sets')}. {st.volumeWarmups === true
+        ? t('Added before your work sets. They count in your volume (Settings), but stay out of records and progression. On an assistance machine each one has more help than the work set, stepping down toward it, and you can still change any of them mid-session.')
+        : t('Added before your work sets and left out of volume, records and progression. On an assistance machine each one has more help than the work set, stepping down toward it, and you can still change any of them mid-session.')}</>
+        : preview ? t('With {0} {1} today: {2}', fmtNum(work), unit, preview)
         : choice === 'count'
           ? st.volumeWarmups === true
             ? isAssisted(cfg)

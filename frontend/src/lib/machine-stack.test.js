@@ -39,11 +39,11 @@ describe('the stack', () => {
     expect(EXIDX[CURL].eq).toBe('dumbbell')
   })
 
-  it('is offered on machines, cables and your own exercises, not on bars, bells or assistance', () => {
+  it('is offered on machines, cables and your own exercises, not on bars or bells', () => {
     expect(canHaveStack(FLY)).toBe(true)
     expect(canHaveStack(PUSHDOWN)).toBe(true)
     expect(canHaveStack({ id: 'c1', n: 'My hip thrust machine', custom: true, eq: 'custom' })).toBe(true)
-    expect(canHaveStack(DIP)).toBe(false)
+    expect(canHaveStack(DIP)).toBe(true)
     expect(canHaveStack(CURL)).toBe(false)
     expect(canHaveStack(SQUAT)).toBe(false)
   })
@@ -76,9 +76,9 @@ describe('the stack', () => {
     expect(ownedKindFor(S, cfg(FLY))).toBe('stack')
     expect(ownedWeightsFor(S, cfg(PUSHDOWN))).toBe(null)
     expect(ownedKindFor(S, cfg(PUSHDOWN))).toBe(null)
-    // A stray list on an assistance machine is never used: there the stack is help, not load.
+    // An assistance machine's list represents the available help, not the load lifted.
     const dip = state([], { stackWeights: { [DIP]: { unit: 'kg', weights: STACK, _ts: 1 } } })
-    expect(ownedWeightsFor(dip, cfg(DIP))).toBe(null)
+    expect(ownedWeightsFor(dip, cfg(DIP))).toEqual(STACK)
   })
 
   it('wins over the dumbbell rack on the exercise it was set on', () => {

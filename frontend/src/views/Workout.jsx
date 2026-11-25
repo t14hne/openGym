@@ -255,16 +255,19 @@ function ExerciseBlock({ entryIdx, compact, listed, dense, editing, onToggle, on
     }, true)
   }
   const addDropRow = i => mutSet(i, row => {
+    const cfg = { ...entry.target, id: entry.id }
+    const assisted = isAssisted(cfg)
+    const grid = dropGrid(S, cfg)
     // A unilateral set drops per side (issue #60): addSideDrop seeds each side from its own weight.
     if (isSideSet(row)) {
       const pct = entry.target?.intensifier?.type === 'dropset' ? entry.target.intensifier.pct : undefined
-      return addSideDrop(row, pct, dropGrid(S, { ...entry.target, id: entry.id }))
+      return addSideDrop(row, pct, grid, assisted)
     }
     const drops = dropsOf(row)
     const base = drops.length ? drops[drops.length - 1].w : (row.w || 0)
     const pct = entry.target?.intensifier?.type === 'dropset' ? entry.target.intensifier.pct : undefined
     // On a weight you can load: the plates you own, else the exercise's step (lib/plates.js).
-    return addDrop(row, { w: nextDropWeight(base, pct, dropGrid(S, { ...entry.target, id: entry.id })), r: row.r })
+    return addDrop(row, { w: nextDropWeight(base, pct, grid, assisted), r: row.r })
   })
   // A rest-pause row's own reps are always the total across every burst (see
   // applyIntensifierPlan/history.js) — clusters are the breakdown of that total, not extra on

@@ -3,7 +3,7 @@ import { tempoOf, guideReps } from '../lib/tempo.js'
 import { useEffect, useState } from 'react'
 import { useStore } from '../store/useStore.js'
 import { useUI } from '../store/useUI.js'
-import { exOr } from '../lib/exercises.js'
+import { exOr, isAssisted } from '../lib/exercises.js'
 import { clampIncline, INCLINE_MAX, INCLINE_STEP, clampLevel, LEVEL_MAX, cardioCol } from '../lib/incline.js'
 import { exerciseNameClass, exerciseNameFor, t } from '../lib/i18n.js'
 import { fmtDate, fmtNum, fmtPlate, exerciseNameText } from '../lib/format.js'
@@ -19,7 +19,7 @@ import {
 import { weightIncrement, stepWeight } from '../lib/progression.js'
 import { speedUnitOf, toSpeed, fromSpeed } from '../lib/speed.js'
 import { effortPickerSheet, exerciseDetailSheet, exerciseHistorySheet, exerciseNoteSheet, menuSheet, barWeightSheet } from '../sheets.jsx'
-import { baseWeightFor, inventoryFor, loadKindFor, rowLoad } from '../lib/plates.js'
+import { baseWeightFor, inventoryFor, loadKindFor, rowLoad, dropGrid } from '../lib/plates.js'
 import { usesBar } from '../lib/bar.js'
 import { plateText } from '../lib/plate-text.js'
 import { ownedWeightsFor, stepOwned } from '../lib/dumbbells.js'
@@ -64,11 +64,11 @@ const toggleWarmup = row => {
   return next
 }
 
-const addDropTo = (row, target) => {
-  if (isSideSet(row)) return addSideDrop(row, target?.intensifier?.pct)
+const addDropTo = (row, target, grid, assisted) => {
+  if (isSideSet(row)) return addSideDrop(row, target?.intensifier?.pct, grid, assisted)
   const drops = dropsOf(row).length ? dropsOf(row) : row.drops || []
   const base = drops.at(-1)?.w ?? row.w ?? 0
-  return addDrop(row, { w: nextDropWeight(base, target?.intensifier?.pct), r: row.r || 0 })
+  return addDrop(row, { w: nextDropWeight(base, target?.intensifier?.pct, grid, assisted), r: row.r || 0 })
 }
 
 const addBurstTo = (row, restSec) => {
@@ -291,7 +291,11 @@ export default function FocusView({
         !isWarmupRow(set) && mode !== 'cardio' && { icon: 'gauge', label: t('Taken to failure'), sub: t('Nothing left in the tank'), on: isFailureSet(set), onClick: () => onMutateSet(setIdx, toggleFailure) },
         // Cardio rates in RPE from here, as in the list's set menu (Workout.jsx): no column to spare.
         !isWarmupRow(set) && mode === 'cardio' && { icon: 'gauge', label: t('How hard it felt'), sub: set.rpe != null ? t(EFFORT.rpe.hd) + ' ' + fmtNum(set.rpe) : t('Not rated yet'), onClick: () => effortPickerSheet('rpe', set.rpe ?? null, value => onField(setIdx, 'rpe', value), { cardio: true }) },
-        { icon: 'arrowDown', label: t('Add drop set'), onClick: () => onMutateSet(setIdx, row => addDropTo(row, entry.target)) },
+        { icon: 'arrowDown', label: t('Add drop set'), onClick: () => onMutateSet(setIdx, row => {
+          const cfg = { ...entry.target, id: entry.id }
+          const assisted = isAssisted(cfg)
+          return addDropTo(row, entry.target, assisted ? dropGrid(S, cfg) : undefined, assisted)
+        }) },
         { icon: 'bolt', label: t('Add burst'), onClick: () => onMutateSet(setIdx, row => addBurstTo(row, ['restpause', 'cluster'].includes(entry.target?.intensifier?.type) ? entry.target.intensifier.restSec : (S.restPauseSec || 15))) },
       ] },
       { more: [{ items: [

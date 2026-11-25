@@ -9,7 +9,7 @@
 //
 // Logged weights stay the total on the bar (or the added load). Everything here is display.
 
-import { exerciseOf as exOf } from './exercises.js'
+import { exerciseOf as exOf, isAssisted } from './exercises.js'
 import { usesBar, barTypeWeight } from './bar.js'
 import { isBw } from './history.js'
 import { weightIncrement } from './progression.js'
@@ -287,6 +287,12 @@ export function dropGrid(S, cfg) {
   // A dumbbell lift with the bells you own listed (issue #376) drops to the heaviest one at or
   // under the drop: a 20% drop from 21 kg is 16.8, and the rack holds a 15.
   const owned = ownedWeightsFor(S, cfg)
+  // On an assisted machine more stack weight means less work. Round toward more help, and
+  // clamp at the end of the actual stack rather than inventing another setting.
+  if (isAssisted(cfg)) {
+    if (owned) return w => owned.find(v => v >= w - 1e-9) ?? owned[owned.length - 1]
+    return weightIncrement(cfg, S?.unit === 'lb' ? 'lb' : 'kg')
+  }
   if (owned) return w => ownedFloor(owned, w)
   const kind = loadKindFor(S, cfg)
   if (ownsPlates(S) && (kind === 'pairs' || kind === 'single')) {

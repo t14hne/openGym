@@ -217,9 +217,9 @@ export const withNoDumbbells = (S, on, now = Date.now()) =>
  */
 export function ownedWeightsFor(S, cfg) {
   const bw = cfg?.bodyweight != null ? !!cfg.bodyweight : isBodyweightEq(cfg?.id)
-  if (bw) return null
-  // An assistance machine's stack is help, not load, and its progression runs the other way.
-  const stack = isAssisted({ ...(cfg || {}) }) ? [] : stackOf(S, cfg?.id)
+  if (bw && !isAssisted(cfg)) return null
+  // Assistance is a stack too: its direction is handled by the progression and warm-up callers.
+  const stack = stackOf(S, cfg?.id)
   if (stack.length) return stack
   const ex = exOf(cfg?.id)
   if (ex?.eq !== 'dumbbell') return null
@@ -238,10 +238,10 @@ export function ownedKindFor(S, cfg) {
 
 /** Equipment with a pin-selected stack of its own. Your own exercises can have one too. */
 export const STACK_EQ = new Set(['leverage machine', 'cable', 'sled machine'])
-/** Whether the exercise (object or id) gets the stack editor: a machine or cable, not assistance. */
+/** Whether the exercise (object or id) gets the stack editor: a machine, cable or custom exercise. */
 export function canHaveStack(exOrId) {
   const ex = typeof exOrId === 'string' ? exOf(exOrId) : exOrId
-  if (!ex || isAssisted(ex)) return false
+  if (!ex) return false
   return STACK_EQ.has(ex.eq) || ex.custom === true
 }
 

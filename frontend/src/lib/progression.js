@@ -24,7 +24,7 @@ import { nextRung } from './ladders.js'
 import { gymSplitView } from './gym-split.js'
 import { isPyramid } from './pyramid.js'
 import { backoffAt } from './backoff.js'
-import { ownedWeightsFor, ownedKindFor, ownedUp, ownedDeload, ownedAround } from './dumbbells.js'
+import { ownedWeightsFor, ownedKindFor, ownedUp, ownedDown, ownedDeload, ownedAround } from './dumbbells.js'
 
 export const POLICIES = ['off', 'linear', 'greyskull', 'double', 'steady', 'triple', 'undulating', 'density', 'ladder', 'time']
 
@@ -544,16 +544,28 @@ export function nextPrescription(S, cfg, routine) {
   // to the owned bell nearest the deload target, and at the heaviest bell the weight holds.
   // Without a list, null, and the increment's grid decides as it always did. A machine with its
   // own stack listed (#688) walks that list the same way.
-  const owned = mode === 'reps' && !assisted ? ownedWeightsFor(S, cfg) : null
-  const harder = (weight, step) => (assisted ? Math.max(0, addStep(weight, -step, inc))
-    : owned ? ownedUp(owned, weight, step > inc ? 2 : 1) ?? weight
-      : addStep(weight, step, inc))
-  const easier = weight => (assisted ? addStep(weight, inc, inc) : owned ? ownedDeload(owned, weight, DELOAD_FACTOR) : deloadTo(weight, inc))
-  // At the heaviest bell there is nothing to raise to: the weight holds and the line says why.
-  const topped = weight => !!owned && ownedUp(owned, weight) == null
+  const owned = mode === 'reps' ? ownedWeightsFor(S, cfg) : null
+  const harder = (weight, step) => {
+    if (assisted && owned) {
+      const first = ownedDown(owned, weight)
+      if (first == null) return weight
+      return step > inc ? ownedDown(owned, first) ?? first : first
+    }
+    if (assisted) return Math.max(0, addStep(weight, -step, inc))
+    return owned ? ownedUp(owned, weight, step > inc ? 2 : 1) ?? weight : addStep(weight, step, inc)
+  }
+  const easier = weight => {
+    if (assisted) return owned ? ownedUp(owned, weight) ?? weight : addStep(weight, inc, inc)
+    return owned ? ownedDeload(owned, weight, DELOAD_FACTOR) : deloadTo(weight, inc)
+  }
+  // At the end of an inventory there is no harder setting: the lightest assistance or the
+  // heaviest ordinary load holds, rather than inventing another weight.
+  const topped = weight => !!owned && (assisted ? ownedDown(owned, weight) == null : ownedUp(owned, weight) == null)
   // A machine's own stack (#688) walks the same way; only the line at the top says which it is.
   const onStack = !!owned && ownedKindFor(S, cfg) === 'stack'
-  const toppedOut = (weight, extra = {}) => ({ policy, kind: 'hold', weight, ...extra, why: onStack
+  const toppedOut = (weight, extra = {}) => ({ policy, kind: 'hold', weight, ...extra, why: assisted
+    ? ['Same weight, aim for {0} reps this time.', extra.reps || last?.goal || cfg.reps || 8]
+    : onStack
     ? ['That’s the whole stack: {0} {1} is the heaviest it goes, so the weight stays.', weight, unit]
     : ['You’ve outgrown the rack: {0} {1} is your heaviest dumbbell, so the weight stays.', weight, unit] })
 
@@ -746,10 +758,14 @@ export function nextPrescription(S, cfg, routine) {
         const perSide = isPerSide(cfg)
         const target1RM = deloadTarget1RM(w, Math.max(...rows), deloadFactorOf(cfg), perSide)
         const ideal = target1RM == null ? null : target1RM / (1 + (perSide ? bottom / 2 : bottom) / 30)
-        const grid = ideal == null ? [] : positiveGridAround(ideal, inc, w, true)
+        const grid = ideal == null ? [] : owned
+          ? ownedAround(ideal, owned, w, true)
+          : positiveGridAround(ideal, inc, w, true)
         if (grid.length) dw = grid.reduce((a, b) => (Math.abs(b - ideal) < Math.abs(a - ideal) ? b : a))
       }
       if (dw == null) dw = easier(w)
+      if (owned && (assisted ? dw <= w : dw >= w)) return out('hold', w, startRows(bottom),
+        ['Stuck for {0} sessions. Hold {1} {2} and use {3} reps.', stalls, w, unit, bottom])
       return out('deload', dw, startRows(bottom), assisted
         ? ['Stuck for {0} sessions. Back to {1} {2} of help, start again at {3} sets of {4}.', stalls, dw, unit, setsMin, bottom]
         : ['Stuck for {0} sessions. Deload to {1} {2} and start again at {3} sets of {4}.', stalls, dw, unit, setsMin, bottom])
@@ -774,9 +790,12 @@ export function nextPrescription(S, cfg, routine) {
       return out('hold', w, [...got.slice(0, n - 1).map(() => top), aim], ['Same weight, aim for {0} reps on the last set.', aim])
     }
     if (n < setsMax) return out('up', w, [...got.map(() => top), bottom], ['{0} reps in every set! Add a set at {1} reps.', top, bottom])
-    return out('up', harder(w, inc), startRows(bottom), assisted
-      ? ['Top of the range on all {0} sets. {1} {2} less help, back to {3} sets of {4}.', n, inc, unit, setsMin, bottom]
-      : ['Top of the range on all {0} sets. {1} {2} more, back to {3} sets of {4}.', n, inc, unit, setsMin, bottom])
+    if (topped(w)) return toppedOut(w, { reps: top, sets: n, rowReps: got })
+    const next = harder(w, inc)
+    const change = owned ? Math.round(Math.abs(next - w) * 100) / 100 : inc
+    return out('up', next, startRows(bottom), assisted
+      ? ['Top of the range on all {0} sets. {1} {2} less help, back to {3} sets of {4}.', n, change, unit, setsMin, bottom]
+      : ['Top of the range on all {0} sets. {1} {2} more, back to {3} sets of {4}.', n, change, unit, setsMin, bottom])
   }
 
   if (steady) {
@@ -789,11 +808,11 @@ export function nextPrescription(S, cfg, routine) {
     if (last.ok && aim >= top) {
       if (topped(w)) return toppedOut(w, { reps: top })
       const up = harder(w, inc)
-      const by = owned ? Math.round((up - w) * 100) / 100 : inc
+      const by = owned ? Math.round(Math.abs(up - w) * 100) / 100 : inc
       return {
         policy, kind: 'up', weight: up, reps: bottom,
         why: assisted
-          ? ['Top of the rep range in every set. {0} {1} less help, back to {2} reps.', inc, unit, bottom]
+          ? ['Top of the rep range in every set. {0} {1} less help, back to {2} reps.', by, unit, bottom]
           : ['Top of the rep range in every set. {0} {1} more, back to {2} reps.', by, unit, bottom]
       }
     }
@@ -805,6 +824,7 @@ export function nextPrescription(S, cfg, routine) {
       const selected = epleyDeload()
       if (selected) return selected
       const dw = easier(w)
+      if (assisted && owned && dw <= w) return { policy, kind: 'hold', weight: w, reps: aim, why: ['Stuck for {0} sessions. Hold {1} {2} and use {3} reps.', stalls, w, unit, aim] }
       return {
         policy, kind: 'deload', weight: dw, reps: bottom,
         why: assisted
@@ -826,9 +846,9 @@ export function nextPrescription(S, cfg, routine) {
     if (last.ok) {
       if (topped(w)) return toppedOut(w, { rest })
       const up = harder(w, inc)
-      const by = owned ? Math.round((up - w) * 100) / 100 : inc
+      const by = owned ? Math.round(Math.abs(up - w) * 100) / 100 : inc
       return { policy, kind: 'up', weight: up, rest: start, why: assisted
-        ? ['Clean at your shortest rest. {0} {1} less help, rest back to {2}s.', inc, unit, start]
+        ? ['Clean at your shortest rest. {0} {1} less help, rest back to {2}s.', by, unit, start]
         : ['Clean at your shortest rest. {0} {1} more, rest back to {2}s.', by, unit, start] }
     }
     // Missing reps on short rest is the rest talking, so a stall gives the rest back, not the weight.
@@ -838,6 +858,7 @@ export function nextPrescription(S, cfg, routine) {
     }
     if (stalls >= deloadAt) {
       const dw = easier(w)
+      if (assisted && owned && dw <= w) return { policy, kind: 'hold', weight: w, rest, why: ['Stuck for {0} sessions. Hold {1} {2} and use {3} reps.', stalls, w, unit, last.goal || cfg.reps] }
       return { policy, kind: 'deload', weight: dw, rest: start, why: assisted
         ? ['Stuck for {0} sessions. Back to {1} {2} of help, then build up again.', stalls, dw, unit]
         : ['Stuck for {0} sessions. Deload to {1} {2}.', stalls, dw, unit] }
@@ -858,11 +879,11 @@ export function nextPrescription(S, cfg, routine) {
       if (topped(w)) return toppedOut(w, { reps: top })
       const up = harder(w, inc)
       // Over owned bells the step is whatever the next one is: 9 → 11 is 2 kg, 18 → 19 is 1.
-      const by = owned ? Math.round((up - w) * 100) / 100 : inc
+      const by = owned ? Math.round(Math.abs(up - w) * 100) / 100 : inc
       return {
         policy, kind: 'up', weight: up, reps: bottom,
         why: assisted
-          ? ['Top of the rep range in every set. {0} {1} less help, back to {2} reps.', inc, unit, bottom]
+          ? ['Top of the rep range in every set. {0} {1} less help, back to {2} reps.', by, unit, bottom]
           : ['Top of the rep range in every set. {0} {1} more, back to {2} reps.', by, unit, bottom]
       }
     }
@@ -870,6 +891,7 @@ export function nextPrescription(S, cfg, routine) {
       const selected = epleyDeload()
       if (selected) return selected
       const dw = easier(w)
+      if (assisted && owned && dw <= w) return { policy, kind: 'hold', weight: w, reps: last.goal || bottom, why: ['Stuck for {0} sessions. Hold {1} {2} and use {3} reps.', stalls, w, unit, last.goal || bottom] }
       return {
         policy, kind: 'deload', weight: dw, reps: bottom,
         why: assisted
@@ -885,11 +907,13 @@ export function nextPrescription(S, cfg, routine) {
   if (last.ok) {
     // Greyskull's final set is taken to failure: double the target reps there and you have
     // earned a double jump.
-    const dbl = policy === 'greyskull' && last.goal > 0 && last.amrap >= last.goal * 2
+    const first = owned ? (assisted ? ownedDown(owned, w) : ownedUp(owned, w)) : null
+    const second = first == null ? null : (assisted ? ownedDown(owned, first) : ownedUp(owned, first))
+    const dbl = policy === 'greyskull' && last.goal > 0 && last.amrap >= last.goal * 2 && (!owned || second != null)
     if (topped(w)) return toppedOut(w)
     const up = harder(w, dbl ? inc * 2 : inc)
     // Over owned bells the jump is the distance to the bell it lands on.
-    const step = owned ? Math.round((up - w) * 100) / 100 : dbl ? inc * 2 : inc
+    const step = owned ? Math.round(Math.abs(up - w) * 100) / 100 : dbl ? inc * 2 : inc
     return {
       policy, kind: 'up', weight: up,
       why: dbl
@@ -903,6 +927,7 @@ export function nextPrescription(S, cfg, routine) {
     const selected = epleyDeload()
     if (selected) return selected
     const dw = easier(w)
+    if (assisted && owned && dw <= w) return { policy, kind: 'hold', weight: w, why: ['Stuck for {0} sessions. Hold {1} {2} and use {3} reps.', stalls, w, unit, last.goal || cfg.reps] }
     return {
       policy, kind: 'deload', weight: dw,
       why: assisted

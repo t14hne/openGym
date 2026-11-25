@@ -5,6 +5,9 @@ import { liveReramp, rerampWarmups } from './history.js'
 import { buildPlannedEntry, buildSessionEntries, buildSessionEntry } from './session-start.js'
 import { isWarmupRow } from './workout-model.js'
 import { dropGrid } from './plates.js'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import WarmupConfig from '../components/WarmupConfig.jsx'
 
 const SQUAT = '0043', BENCH = '0025', CURL = '0294', RAISE = '0334', PULLUP = '0652', WPULL = '0841', LEGEXT = '0585', ASSISTED = '0017', LUNGE = '0336'
 const warm = rows => rows.filter(isWarmupRow)
@@ -81,6 +84,24 @@ describe('rounding to what the gym can load', () => {
 })
 
 describe('where the warm-ups come from', () => {
+  it('does not turn saved percentage warm-ups into harder assisted sets', () => {
+    const c = cfg(ASSISTED, { weight: 25, warmup: 'own', warmupRows: [{ wp: 50, r: 8 }, { wp: 80, r: 5 }] })
+    expect(warmupBlock(state(), c, [{ w: 25, r: 5 }], { grid: [17.5, 25, 32.5, 40] })).toEqual([])
+    expect(warm(planned(state(), c).sets)).toEqual([])
+    expect(c.warmupRows).toEqual([{ wp: 50, r: 8 }, { wp: 80, r: 5 }])
+  })
+  it('also blocks percentage warm-ups for explicitly assisted custom exercises', () => {
+    const c = cfg(CURL, { assisted: true, weight: 30, warmup: 'own', warmupRows: [{ wp: 50, r: 8 }] })
+    expect(warmupBlock(state(), c, [{ w: 30, r: 5 }], { grid: 5 })).toEqual([])
+  })
+  it('explains the unavailable saved block and offers the ramp-set alternative', () => {
+    const c = cfg(ASSISTED, { weight: 25, warmup: 'own', warmupRows: [{ wp: 50, r: 8 }] })
+    const html = renderToStaticMarkup(createElement(WarmupConfig, { st: state(), ex: { id: ASSISTED }, c, setC: () => {} }))
+    expect(html).toContain('Not available right now.')
+    expect(html).toContain('A number of ramp sets')
+    expect(html).toContain('more help than the work set')
+    expect(html).not.toContain('warmup-rows')
+  })
   it('off by default: nothing changes for anyone', () => {
     expect(warmupAutoOf({})).toBe('off')
     const rows = planned(state(), cfg(SQUAT)).sets

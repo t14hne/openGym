@@ -165,6 +165,9 @@ export const workLoadOf = rows => {
 export function warmupBlock(S, cfg, rows, { grid, floor = 0, unit = 'kg' } = {}) {
   const source = warmupSource(S, cfg)
   if (source.kind !== 'auto' && source.kind !== 'own') return null
+  // A percentage below 100 reduces assistance and makes the movement harder. The saved
+  // percentages do not encode bodyweight or machine mechanics, so do not reinterpret them.
+  if (isAssisted(cfg)) return []
   const work = workLoadOf(rows)
   if (!(work > 0)) return []
   const perSide = isPerSide(cfg)

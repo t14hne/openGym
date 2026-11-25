@@ -887,7 +887,7 @@ function shapeRows(sets, cfg, grid) {
     const withDrops = row => {
       const drops = []
       let w = row.w || 0
-      for (let k = 0; k < count; k++) { w = nextDropWeight(w, pct, grid); drops.push({ w, r: row.r }) }
+      for (let k = 0; k < count; k++) { w = nextDropWeight(w, pct, grid, isAssisted(cfg)); drops.push({ w, r: row.r }) }
       return { ...row, type: 'dropset', drops }
     }
     // Reddit: "drop sets only on the last set, in the plan". `on: 'last'` stamps the last work
@@ -1214,13 +1214,20 @@ const rungDown = (x, step) => (typeof step === 'function' ? step(x) : Array.isAr
 // part of your body weight, so less load is harder, and halving it made the warm-up harder than
 // the work sets. Its warm-ups give MORE help instead: the first at 1.5× the work weight, each
 // next one halving what is left down to it, rounded UP to the step (a notch more help is still a
-// warm-up). `from` is the warm-up before it, 0 for the first. The step is never a dumbbell list
-// here (ownedWeightsFor), but should one arrive the rung is kept as is rather than snapped down.
+// warm-up). `from` is the warm-up before it, 0 for the first. A listed stack rounds up to
+// available assistance; if no listed setting reaches the work weight, keep the work weight.
 function assistedRung(from, to, step) {
   const top = from > 0 ? from : 2 * to
   if (!(top > to)) return to
   const x = to + (top - to) / 2
-  if (Array.isArray(step) || typeof step === 'function') return x
+  if (Array.isArray(step)) {
+    const atLeast = step.find(w => w >= x - 1e-9) ?? step[step.length - 1]
+    return atLeast >= to ? atLeast : to
+  }
+  if (typeof step === 'function') {
+    const atLeast = Number(step(x))
+    return Number.isFinite(atLeast) && atLeast >= to ? atLeast : to
+  }
   return Math.max(to, Math.round(Math.ceil(x / step - 1e-9) * step * 1000) / 1000)   // 1e-9: 37.5 / 2.5 must stay 15, not 16
 }
 

@@ -80,10 +80,17 @@ describe('weight stack editor', () => {
     expect(S().stackWeights[FLY].weights).toEqual([5, 11.3, 18.1, 25, 30, 35, 40])
   })
 
-  it('is not offered on a barbell or an assistance machine', () => {
+  it('is not offered on a barbell', () => {
     act(() => barWeightSheet(SQUAT, { id: SQUAT }))
     expect(mountTopSheet().textContent).not.toContain('Weight stack')
+  })
+
+  it('lets an assistance machine save its actual weight settings', () => {
     act(() => barWeightSheet(DIP, { id: DIP }))
-    expect(mountTopSheet().textContent).not.toContain('Weight stack')
+    const host = mountTopSheet()
+    expect(host.textContent).toContain('Weight stack')
+    type(field(host, 'Weight stack: Weight (kg)'), '17.5')
+    act(() => button(host, 'Add').click())
+    expect(S().stackWeights[DIP].weights).toEqual([17.5])
   })
 })

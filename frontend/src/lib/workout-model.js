@@ -138,24 +138,24 @@ export function setClusterAt(set, i, patch) {
 /**
  * Suggested weight for the next drop: pct% lighter than the previous weight, on a weight you can
  * actually load. `grid` is the exercise's weight step (5 → 80 kg, not 80.5) or a function that
- * snaps a weight onto the plates you own (lib/plates.js dropGrid); without one it rounds to .5,
- * the way it always did. A drop never comes out at or above the weight it drops from.
+ * snaps a weight onto the plates you own (lib/plates.js dropGrid); without one it rounds to .5.
+ * Assistance goes in the other direction: more help makes the drop easier.
  */
-export function nextDropWeight(prevWeight, pct = 20, grid) {
+export function nextDropWeight(prevWeight, pct = 20, grid, assisted = false) {
   const p = Math.min(90, Math.max(1, Number(pct) || 20))
   const prev = Math.max(0, Number(prevWeight) || 0)
-  const raw = prev * (1 - p / 100)
+  const raw = prev * (1 + (assisted ? p : -p) / 100)
   const tidy = w => Math.round(w * 1000) / 1000
   if (typeof grid === 'function') {
     const w = Number(grid(raw))
-    if (Number.isFinite(w) && w >= 0) return tidy(w)
+    if (Number.isFinite(w) && w >= 0) return tidy(assisted ? Math.max(prev, w) : w)
   } else if (Number(grid) > 0) {
     const step = Number(grid)
-    let w = Math.round(raw / step) * step
-    if (prev > 0 && w >= prev) w = prev - step
+    let w = (assisted ? Math.ceil(raw / step - 1e-9) : Math.round(raw / step)) * step
+    if (!assisted && prev > 0 && w >= prev) w = prev - step
     return tidy(Math.max(0, w))
   }
-  return Math.round(raw * 2) / 2
+  return (assisted ? Math.ceil(raw * 2 - 1e-9) : Math.round(raw * 2)) / 2
 }
 
 /** Suggested reps for the next rest-pause burst: roughly half the previous rep count. */
@@ -336,11 +336,11 @@ function patchBothSides(row, fn) {
 
 // Append a drop to both sides, each seeded from its own side's weight (pct lighter) and reps.
 // `grid` as nextDropWeight's.
-export function addSideDrop(row, pct, grid) {
+export function addSideDrop(row, pct, grid, assisted = false) {
   return patchBothSides(row, side => {
     const drops = dropsOf(side)
     const base = drops.length ? drops[drops.length - 1].w : (side.w || 0)
-    return addDrop(side, { w: nextDropWeight(base, pct, grid), r: side.r })
+    return addDrop(side, { w: nextDropWeight(base, pct, grid, assisted), r: side.r })
   })
 }
 export function removeSideDropAt(row, i) {
